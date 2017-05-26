@@ -2,36 +2,52 @@
 'use strict';
 
 
-var CONFIG_LEDPIN = 7; // Define led pin
+//var CONFIG_LEDPIN = 7; // Define led pin
 
-var BME280 = require('./SpiBME280');
-var wpi = require('wiring-pi');
+//var BME280 = require('./SpiBME280');
+//var wpi = require('wiring-pi');
+var led = require('sense-hat-led');
+var nodeimu = require('nodeimu');
 var shell = require('shelljs');
 shell.config.silent = true;
-wpi.setup('wpi');
-wpi.pinMode(CONFIG_LEDPIN, wpi.OUTPUT);
+//setup the IMU sensors
+var sensors = new nodeimu.IMU();
+//wpi.setup('wpi');
+//wpi.pinMode(CONFIG_LEDPIN, wpi.OUTPUT);
 
-var bme = new BME280(wpi);
-bme.init();
+//var bme = new BME280(wpi);
+//bme.init();
+
+//colors (RGB)
+var white = [255,255,255];
+var red = [255,0,0];
+var green = [0,255,0];
+var blue = [0,0,255];
 
 var raspberry = exports;
 raspberry.getVersion = function() {
-  return '1.1';
+  return '1.2';
 };
 
 
 raspberry.changeLightStatus = function(value) {
   // var status = wpi.digitalRead(CONFIG_LEDPIN);
   value = (value != 0) ? 1 : 0;
-  wpi.digitalWrite(CONFIG_LEDPIN, value);
+  //wpi.digitalWrite(CONFIG_LEDPIN, value);
+  if(value == 0){ led.clear(); }
+  else{ led.clear(white);}
 };
 
 raspberry.lightBlink = function() {
   var count = 1;
   setInterval(function() {
     if (count-- > 0) {
-      wpi.digitalWrite(CONFIG_LEDPIN, 1);
-      setTimeout(() => { wpi.digitalWrite(CONFIG_LEDPIN, 0); }, 100);
+      //wpi.digitalWrite(CONFIG_LEDPIN, 1);
+      led.clear(white);
+      setTimeout(() => { 
+        //wpi.digitalWrite(CONFIG_LEDPIN, 0);
+        led.clear(); 
+      }, 100);
     } else {
       clearTimeout();
     }
@@ -46,9 +62,11 @@ function generateRandomIncrement() {
 raspberry.getSensorData = function() {
   var sensorJson;
   try {
-    var data = bme.readSensorData();
+    //var data = bme.readSensorData();
+    var data = IMU.getValueSync();
     sensorJson = JSON.stringify(
-        {'temperature': data.temperature_C, 'humidity': data.humidity});
+        //{'temperature': data.temperature_C, 'humidity': data.humidity});
+        {'temperature': data.temperature, 'humidity': data.humidity});
   } catch (error) {
     // Generate a default number if hardware error.
     sensorJson = '{"Temperature":' + generateRandomIncrement() +
