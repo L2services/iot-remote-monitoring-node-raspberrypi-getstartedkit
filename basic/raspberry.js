@@ -11,7 +11,7 @@ var nodeimu = require('nodeimu');
 var shell = require('shelljs');
 shell.config.silent = true;
 //setup the IMU sensors
-var sensors = new nodeimu.IMU();
+var IMU = new nodeimu.IMU();
 //wpi.setup('wpi');
 //wpi.pinMode(CONFIG_LEDPIN, wpi.OUTPUT);
 
@@ -39,7 +39,7 @@ raspberry.changeLightStatus = function(value) {
 };
 
 raspberry.lightBlink = function() {
-  var count = 1;
+  var count = 5;
   setInterval(function() {
     if (count-- > 0) {
       //wpi.digitalWrite(CONFIG_LEDPIN, 1);
@@ -53,6 +53,11 @@ raspberry.lightBlink = function() {
     }
   }, 300);
 };
+
+raspberry.setMatrixColor = function(requestedColor) {
+  var colors = {"red": [255,0,0], "green": [0,255,0], "blue": [0,0,255], "white": [255,255,255], "black": [0,0,0] };
+  led.clear(colors[requestedColor]);
+}
 
 
 function generateRandomIncrement() {

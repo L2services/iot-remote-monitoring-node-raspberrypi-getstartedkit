@@ -47,6 +47,7 @@ var reportedProperties = {
     'ChangeLightStatus--LightStatusValue-int':
         'Change light status, 0 light off, 1 light on',
     'LightBlink': 'Blink Light',
+    'SetMatrixColor--Color-string': 'Display a solid color on the 8x8 matrix: red, green, blue, black, white',
     'InitiateFirmwareUpdate--FwPackageURI-string':
         'Updates device Firmware. Use parameter FwPackageURI to specifiy the URI of the firmware file, e.g. https://raw.githubusercontent.com/IoTChinaTeam/azure-remote-monitoring-raspberry-pi-node/master/advance/2.0/raspberry.js'
   },
@@ -74,6 +75,23 @@ function onLightBlink(request, response) {
 
   // Complete the response
   response.send(200, 'Light blink done!', function(err) {
+    if (!!err) {
+      console.error(
+          'An error ocurred when sending a method response:\n' +
+          err.toString());
+    } else {
+      console.log(
+          'Response to method \'' + request.methodName +
+          '\' sent successfully.');
+    }
+  });
+}
+
+function onSetMatrixColor(request, response) {
+  raspberry.setMatrixColor(request.payload.Color);
+
+  // Complete the response
+  response.send(200, 'SetMatrixColor done!', function(err) {
     if (!!err) {
       console.error(
           'An error ocurred when sending a method response:\n' +
@@ -153,6 +171,7 @@ client.open(function(err) {
 
     // Start sending telemetry
     var sendInterval = setInterval(function() { updateEvent(); }, 1000);
+    //console.log("sendInterval: " + getTimeLeft(sendInterval));
 
     // Create device twin
     client.getTwin(function(err, twin) {
@@ -163,10 +182,11 @@ client.open(function(err) {
 
         twin.on('properties.desired', function(delta) {
           var interval = parseInt(delta.TelemetryInterval);
-          if (interval != 0) {
+          console.log("Received interval: " + interval);
+          if (interval && interval != 0) {
             clearInterval(sendInterval);
-            sendInterval =
-                setInterval(function() { updateEvent(); }, interval * 1000);
+            var newInterval = interval * 1000;
+            sendInterval = setInterval(function() { updateEvent(); }, newInterval);
             deviceMetaData.DeviceProperties.TelemetryInterval = interval;
             reportedProperties.Config.TelemetryInterval = interval;
             // Update reported properties
@@ -188,8 +208,8 @@ client.open(function(err) {
         // Register handlers for direct methods
         client.onDeviceMethod('ChangeLightStatus', onChangeLightStatus);
         client.onDeviceMethod('LightBlink', onLightBlink);
-        client.onDeviceMethod(
-            'InitiateFirmwareUpdate', onInitiateFirmwareUpdate);
+        client.onDeviceMethod('SetMatrixColor', onSetMatrixColor);
+        client.onDeviceMethod('InitiateFirmwareUpdate', onInitiateFirmwareUpdate);
       }
     });
 
