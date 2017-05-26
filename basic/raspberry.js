@@ -11,7 +11,7 @@ var nodeimu = require('nodeimu');
 var shell = require('shelljs');
 shell.config.silent = true;
 //setup the IMU sensors
-var sensors = new nodeimu.IMU();
+var IMU = new nodeimu.IMU();
 //wpi.setup('wpi');
 //wpi.pinMode(CONFIG_LEDPIN, wpi.OUTPUT);
 
