@@ -1,8 +1,9 @@
----
-services: iot-hub, iot-suite
-platforms: nodejs ,raspberry-pi
-author: dobett
----
+# SenseHat
+This is a variation of the Microsoft provided code to connect a Raspberry Pi to the Azure IoT Remote Monitoring Suite specifically designed to work with the Sense Hat. 
+
+This project uses the `nodeimu` and `sense-hat-led` NPM libraries to enable access to the onboard SenseHat temperature/humidity and LED Matrix respectively.
+
+Follow the steps associated with the [Real sensor (Intermediate)](https://docs.microsoft.com/azure/iot-suite/iot-suite-raspberry-pi-kit-node-get-started-basic) guide replacing the manual wiring of the LED and BME280 sensor with the simple installation of the Pi Sense Hat.
 
 # Connect your Microsoft Azure IoT Raspberry Pi 3 Starter Kit to the remote monitoring solution
 
